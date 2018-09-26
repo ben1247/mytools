@@ -1,0 +1,68 @@
+package org.zy.mytools.domain;
+
+/**
+ * Created by yuezhang on 18/9/26.
+ */
+public class Order {
+
+    private String statementId;
+
+    private String userName;
+
+    private String goodsName;
+
+    private String amount;
+
+    private String system;
+
+    public String getStatementId() {
+        return statementId;
+    }
+
+    public void setStatementId(String statementId) {
+        this.statementId = statementId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "statementId='" + statementId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", goodsName='" + goodsName + '\'' +
+                ", amount='" + amount + '\'' +
+                ", system='" + system + '\'' +
+                '}';
+    }
+}
