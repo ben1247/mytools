@@ -1,9 +1,11 @@
 package org.zy.mytools.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by yuezhang on 18/9/26.
  */
-public class Order {
+public class Order implements Serializable {
 
     private String statementId;
 
@@ -11,9 +13,23 @@ public class Order {
 
     private String goodsName;
 
+    private String system;
+
     private String amount;
 
-    private String system;
+
+    public Order(){
+
+    }
+
+    public Order(String csvLine){
+        String [] array = csvLine.split(",");
+        statementId = array[0];
+        userName = array[1];
+        goodsName = array[2];
+        system = array[3];
+        amount = array[4];
+    }
 
     public String getStatementId() {
         return statementId;

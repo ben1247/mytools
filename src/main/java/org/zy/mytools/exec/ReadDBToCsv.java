@@ -139,8 +139,6 @@ public class ReadDBToCsv {
     public static void main(String [] args){
 
         // 读数据
-        String headLine = "支付流水号,渠道流水号,价格,商品名称";
-        String footLine = "xxx,总金额,%s,xxx";
         BufferedReader br = null;
 
         Map<String,PayStatement> csvMap = new HashMap<>();
@@ -171,6 +169,8 @@ public class ReadDBToCsv {
 
 
         // 写数据
+        String headLine = "支付流水号,渠道流水号,价格,商品名称";
+        String footLine = "xxx,总金额,%s,xxx";
         BufferedWriter bw = null;
         try {
 
