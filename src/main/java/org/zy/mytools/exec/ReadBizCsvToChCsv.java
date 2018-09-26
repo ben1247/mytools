@@ -84,7 +84,8 @@ public class ReadBizCsvToChCsv {
         }
 
         // 写差异数据
-        String headLine = "支付流水号,用户名,商品名称,价格,系统";
+//        String headLine = "支付流水号,用户名,商品名称,价格,系统";
+        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
         String footLine = "xxx,总金额,%s,xxx";
         BufferedWriter bw = null;
         try {
@@ -98,10 +99,21 @@ public class ReadBizCsvToChCsv {
             for (Order order : orderList){
                 PayStatement statement = statementMap.get(order.getStatementId());
                 if (statement == null){
-                    String writeLine = Order.getWriteCsv(order);
-                    CsvUtil.writeLine(bw,writeLine);
+//                    String writeLine = Order.getWriteCsv(order);
+//                    CsvUtil.writeLine(bw,writeLine);
                     diffLength++;
                     totalAmount += Double.parseDouble(order.getAmount());
+                }else{
+                    StringBuilder writeLine = new StringBuilder();
+                    writeLine.append(order.getStatementId()).append("\t").append(",")
+                            .append(order.getUserName()).append(",")
+                            .append(order.getGoodsName()).append(",")
+                            .append(order.getAmount()).append(",")
+                            .append(order.getSystem()).append(",")
+                            .append(statement.getSubject()).append(",")
+                            .append(statement.getAmount());
+                    CsvUtil.writeLine(bw,writeLine.toString());
+
                 }
             }
 
