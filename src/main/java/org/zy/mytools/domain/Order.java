@@ -31,6 +31,16 @@ public class Order implements Serializable {
         amount = array[4];
     }
 
+    public static String getWriteCsv(Order order){
+        StringBuilder sb = new StringBuilder();
+        sb.append(order.getStatementId()).append("\t").append(",")
+                .append(order.getUserName()).append(",")
+                .append(order.getGoodsName()).append(",")
+                .append(order.getAmount()).append(",")
+                .append(order.getSystem());
+        return sb.toString();
+    }
+
     public String getStatementId() {
         return statementId;
     }

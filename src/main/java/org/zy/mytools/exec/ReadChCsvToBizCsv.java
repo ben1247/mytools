@@ -20,9 +20,14 @@ import java.util.Map;
 public class ReadChCsvToBizCsv {
 
     // 易付宝201806
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-new.csv";
-    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-ddpos-ddp.csv";
-    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-ddpos-ddp-diff.csv";
+//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-new.csv";
+//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-ddpos-ddp.csv";
+//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-ddpos-ddp-diff.csv";
+
+    // 易付宝201807
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807.csv";
+    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
+    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
 
     public static void main(String [] args){
 
