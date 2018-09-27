@@ -18,9 +18,14 @@ import java.util.Map;
 public class ReadBizCsvToChCsv {
 
     // 易付宝201807
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807.csv";
-    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
-    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
+//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807.csv";
+//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
+//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
+
+    // 支付宝201808
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-pay.csv";
+    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp.csv";
+    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp-diff.csv";
 
     public static void main(String [] args){
 
@@ -84,8 +89,8 @@ public class ReadBizCsvToChCsv {
         }
 
         // 写差异数据
-//        String headLine = "支付流水号,用户名,商品名称,价格,系统";
-        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
+        String headLine = "支付流水号,用户名,商品名称,价格,系统";
+//        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
         String footLine = "xxx,总金额,%s,xxx";
         BufferedWriter bw = null;
         try {
@@ -99,20 +104,20 @@ public class ReadBizCsvToChCsv {
             for (Order order : orderList){
                 PayStatement statement = statementMap.get(order.getStatementId());
                 if (statement == null){
-//                    String writeLine = Order.getWriteCsv(order);
-//                    CsvUtil.writeLine(bw,writeLine);
+                    String writeLine = Order.getWriteCsv(order);
+                    CsvUtil.writeLine(bw,writeLine);
                     diffLength++;
                     totalAmount += Double.parseDouble(order.getAmount());
                 }else{
-                    StringBuilder writeLine = new StringBuilder();
-                    writeLine.append(order.getStatementId()).append("\t").append(",")
-                            .append(order.getUserName()).append(",")
-                            .append(order.getGoodsName()).append(",")
-                            .append(order.getAmount()).append(",")
-                            .append(order.getSystem()).append(",")
-                            .append(statement.getSubject()).append(",")
-                            .append(statement.getAmount());
-                    CsvUtil.writeLine(bw,writeLine.toString());
+//                    StringBuilder writeLine = new StringBuilder();
+//                    writeLine.append(order.getStatementId()).append("\t").append(",")
+//                            .append(order.getUserName()).append(",")
+//                            .append(order.getGoodsName()).append(",")
+//                            .append(order.getAmount()).append(",")
+//                            .append(order.getSystem()).append(",")
+//                            .append(statement.getSubject()).append(",")
+//                            .append(statement.getAmount());
+//                    CsvUtil.writeLine(bw,writeLine.toString());
 
                 }
             }
