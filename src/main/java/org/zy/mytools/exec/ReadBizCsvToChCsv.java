@@ -23,7 +23,7 @@ public class ReadBizCsvToChCsv {
 //    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
 
     // 支付宝201808
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-pay.csv";
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808.csv";
     static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp.csv";
     static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp-diff.csv";
 
@@ -53,6 +53,30 @@ public class ReadBizCsvToChCsv {
             if (br != null){
                 try {
                     br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // 读第三方流水,第三方流水交易号作为key
+        BufferedReader br3 = null;
+        Map<String,PayStatement> statementMap2 = new HashMap<>();
+        try {
+            br3 = CsvUtil.getBufferedReader(readChannelUrl);
+            String readLine;
+            while ((readLine = br3.readLine()) != null)  //读取到的内容给line变量
+            {
+                PayStatement statement = new PayStatement(readLine);
+                statementMap2.put(statement.getTransactionId(),statement);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if (br3 != null){
+                try {
+                    br3.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -103,6 +127,14 @@ public class ReadBizCsvToChCsv {
 
             for (Order order : orderList){
                 PayStatement statement = statementMap.get(order.getStatementId());
+                if (statement == null){
+                    System.out.println("未匹配："+order.getStatementId() + "   " + order.getGoodsName());
+                    statement = statementMap2.get(order.getStatementId());
+                    if (statement != null){
+                        System.out.println("第三方流水号："+statement.getTransactionId() + "   " + statement.getSubject());
+                    }
+                }
+
                 if (statement == null){
                     String writeLine = Order.getWriteCsv(order);
                     CsvUtil.writeLine(bw,writeLine);
