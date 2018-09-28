@@ -15,15 +15,15 @@ import java.util.*;
  */
 public class ReadBizCsvToChCsv {
 
-    // 易付宝201807
-//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807.csv";
-//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
-//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
+    // 易付宝201808
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/yifubao/yifubao201808.csv";
+    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/yifubao/yifubao201808-ddpos-ddp.csv";
+    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/yifubao/yifubao201808-biz-ch-diff.csv";
 
     // 支付宝201808
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808.csv";
-    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808-ddpos-ddp.csv";
-    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808-biz-ch-diff.csv";
+//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808.csv";
+//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808-ddpos-ddp.csv";
+//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808-biz-ch-diff.csv";
 
     // 微信201808
 //    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808.csv";
