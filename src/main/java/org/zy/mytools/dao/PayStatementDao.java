@@ -43,6 +43,34 @@ public class PayStatementDao {
 
     }
 
+    public PayStatement getPayStatementByOutOrderNo(String outTradeNo){
+        String baseSql = "select statement_id,transaction_Id,user_name from pay_statement where outTrade_no = '%s' ";
+        String sql = String.format(baseSql,outTradeNo);
+
+        Connection conn = null;
+        Statement stat = null;
+        ResultSet rs = null;
+        PayStatement payStatement = null;
+        try {
+            conn = DBConnect.getConnection();
+            stat = DBConnect.getStatement(conn);
+            rs = DBConnect.getResultSet(stat,sql);
+            // 输出查询结果
+            while(rs.next()){
+                payStatement = new PayStatement();
+                payStatement.setStatementId(rs.getString("statement_id"));
+                payStatement.setTransactionId(rs.getString("transaction_Id"));
+                payStatement.setUserName(rs.getString("user_name"));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            DBConnect.closeAll(conn,stat,rs);
+        }
+
+        return payStatement;
+    }
+
     public List<PayStatement> getPayStatementList(
             String merchantId , String payWays ,
             String startTime , String endTime ,

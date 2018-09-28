@@ -17,6 +17,8 @@ public class Order implements Serializable {
 
     private String amount;
 
+    private String orderNo;
+
 
     public Order(){
 
@@ -29,6 +31,7 @@ public class Order implements Serializable {
         goodsName = array[2];
         system = array[3];
         amount = array[4];
+        orderNo = array[5];
     }
 
     public static String getWriteCsv(Order order){
@@ -81,14 +84,23 @@ public class Order implements Serializable {
         this.system = system;
     }
 
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
                 "statementId='" + statementId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", goodsName='" + goodsName + '\'' +
-                ", amount='" + amount + '\'' +
                 ", system='" + system + '\'' +
+                ", amount='" + amount + '\'' +
+                ", orderNo='" + orderNo + '\'' +
                 '}';
     }
 }

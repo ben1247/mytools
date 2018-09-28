@@ -1,5 +1,6 @@
 package org.zy.mytools.exec;
 
+import org.zy.mytools.dao.PayStatementDao;
 import org.zy.mytools.domain.Order;
 import org.zy.mytools.domain.PayStatement;
 import org.zy.mytools.util.CsvUtil;
@@ -30,6 +31,8 @@ public class ReadBizCsvToChCsv {
     static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-biz-ch-diff.csv";
 
     public static void main(String [] args){
+
+        PayStatementDao payStatementDao = new PayStatementDao();
 
         // 读第三方流水
         BufferedReader br = null;
@@ -118,8 +121,8 @@ public class ReadBizCsvToChCsv {
         }
 
         // 写差异数据
-//        String headLine = "支付流水号,用户名,商品名称,价格,系统";
-        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
+        String headLine = "支付流水号,用户名,商品名称,价格,系统,订单号";
+//        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
         String footLine = ",,总金额,%s,";
         BufferedWriter bw = null;
         try {
@@ -135,12 +138,19 @@ public class ReadBizCsvToChCsv {
 
             for (Order order : orderList){
                 PayStatement statement = statementMap.get(order.getStatementId());
-//                if (statement == null){
-//                    statement = statementMap2.get(order.getStatementId());
-//                    if (statement != null){
-//                        System.out.println("第三方流水号："+statement.getTransactionId() + "   " + statement.getSubject());
-//                    }
-//                }
+                if (statement == null){
+                    statement = statementMap2.get(order.getStatementId());
+                    if (statement != null){
+                        System.out.println("第三方流水号："+statement.getTransactionId() + "   " + statement.getSubject());
+                    }
+                }
+                // 查支付中心，拿到交易流水信息
+                if (statement == null){
+                    PayStatement tempStatement = payStatementDao.getPayStatementByOutOrderNo(order.getOrderNo());
+                    if (tempStatement != null){
+                        statement = statementMap2.get(tempStatement.getTransactionId());
+                    }
+                }
 
                 if (statement == null){
                     String writeLine = Order.getWriteCsv(order);
@@ -148,8 +158,8 @@ public class ReadBizCsvToChCsv {
                     diffLength++;
                     totalAmount += Double.parseDouble(order.getAmount());
                 }else{
-                    Double orderAmount = Double.parseDouble(order.getAmount());
-                    Double statementAmount = Double.parseDouble(statement.getAmount());
+//                    Double orderAmount = Double.parseDouble(order.getAmount());
+//                    Double statementAmount = Double.parseDouble(statement.getAmount());
 //                    if (!Objects.equals(orderAmount, statementAmount)){
 //                        StringBuilder writeLine = new StringBuilder();
 //                        writeLine.append(order.getStatementId()).append("\t").append(",")
@@ -161,16 +171,16 @@ public class ReadBizCsvToChCsv {
 //                                .append(statement.getAmount());
 //                        CsvUtil.writeLine(bw,writeLine.toString());
 //                    }
-                    csvAmount += statementAmount;
-                    bizAmount += orderAmount;
+//                    csvAmount += statementAmount;
+//                    bizAmount += orderAmount;
                 }
             }
 
             CsvUtil.writeLine(bw,String.format(footLine,totalAmount));
 
             System.out.println("未匹配的数据数量："+diffLength);
-            System.out.println("流水匹配金额："+csvAmount);
-            System.out.println("业务匹配总金额："+bizAmount);
+//            System.out.println("流水匹配金额："+csvAmount);
+//            System.out.println("业务匹配总金额："+bizAmount);
             System.out.println("业务未匹配总金额："+totalAmount);
 
         }catch (Exception e){
