@@ -36,6 +36,8 @@ public class ReadChCsvToBizCsv {
 
     public static void main(String [] args){
 
+        PayStatementDao statementDao = new PayStatementDao();
+
         // 读第三方流水
         BufferedReader br = null;
         List<PayStatement> statementList = new ArrayList<>();
@@ -63,7 +65,7 @@ public class ReadChCsvToBizCsv {
             }
         }
 
-        // 读业务订单
+        // 读业务订单－根据statementId作为key
         BufferedReader br2 = null;
         Map<String,Order> orderMap = new HashMap<>();
         try {
@@ -90,6 +92,29 @@ public class ReadChCsvToBizCsv {
             }
         }
 
+        // 读业务订单-根据orderNo作为key
+        BufferedReader br3 = null;
+        Map<String,Order> orderMap2 = new HashMap<>();
+        try {
+            br3 = CsvUtil.getBufferedReader(readBizUrl);
+            String readLine;
+            while ((readLine = br3.readLine()) != null)  //读取到的内容给line变量
+            {
+                Order order = new Order(readLine);
+                orderMap2.put(order.getOrderNo(),order);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if (br3 != null){
+                try {
+                    br3.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         // 写差异数据
         String headLine = "支付流水号,渠道流水号,价格,商品名称";
         String footLine = ",,总金额,%s,";
@@ -104,6 +129,14 @@ public class ReadChCsvToBizCsv {
 
             for (PayStatement statement : statementList){
                 Order order = orderMap.get(statement.getStatementId());
+
+                // 查支付中心
+                if (order == null){
+                    PayStatement dbStatement = statementDao.getPayStatement(statement.getStatementId(),statement.getTransactionId());
+                    if (dbStatement != null){
+                        order = orderMap2.get(dbStatement.getOutTradeNo());
+                    }
+                }
                 if (order == null){
                     String writeLine = PayStatement.getWriteCsv(statement);
                     CsvUtil.writeLine(bw,writeLine);

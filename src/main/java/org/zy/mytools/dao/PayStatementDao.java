@@ -15,7 +15,7 @@ import java.util.List;
 public class PayStatementDao {
 
     public PayStatement getPayStatement(String statementId, String transactionId){
-        String baseSql = "select statement_id,transaction_Id,user_name from pay_statement where statement_id = '%s' and transaction_Id = '%s'";
+        String baseSql = "select statement_id,transaction_Id,user_name,outTrade_no from pay_statement where statement_id = '%s' and transaction_Id = '%s'";
         String sql = String.format(baseSql,statementId,transactionId);
 
         Connection conn = null;
@@ -32,6 +32,7 @@ public class PayStatementDao {
                 payStatement.setStatementId(rs.getString("statement_id"));
                 payStatement.setTransactionId(rs.getString("transaction_Id"));
                 payStatement.setUserName(rs.getString("user_name"));
+                payStatement.setOutTradeNo(rs.getString("outTrade_no"));
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -44,7 +45,7 @@ public class PayStatementDao {
     }
 
     public PayStatement getPayStatementByOutOrderNo(String outTradeNo){
-        String baseSql = "select statement_id,transaction_Id,user_name from pay_statement where outTrade_no = '%s' ";
+        String baseSql = "select statement_id,transaction_Id,user_name,outTrade_no from pay_statement where outTrade_no = '%s' ";
         String sql = String.format(baseSql,outTradeNo);
 
         Connection conn = null;
@@ -61,6 +62,7 @@ public class PayStatementDao {
                 payStatement.setStatementId(rs.getString("statement_id"));
                 payStatement.setTransactionId(rs.getString("transaction_Id"));
                 payStatement.setUserName(rs.getString("user_name"));
+                payStatement.setOutTradeNo(rs.getString("outTrade_no"));
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -17,6 +17,8 @@ public class PayStatement implements Serializable{
 
     private String userName;
 
+    private String outTradeNo;
+
     public PayStatement(){
 
     }
@@ -76,6 +78,14 @@ public class PayStatement implements Serializable{
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getOutTradeNo() {
+        return outTradeNo;
+    }
+
+    public void setOutTradeNo(String outTradeNo) {
+        this.outTradeNo = outTradeNo;
     }
 
     @Override
