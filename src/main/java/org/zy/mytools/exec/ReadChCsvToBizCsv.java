@@ -30,9 +30,14 @@ public class ReadChCsvToBizCsv {
 //    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
 
     // 微信201808
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808.csv";
-    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddpos-ddp.csv";
-    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ch-biz-diff.csv";
+//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808.csv";
+//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddpos-ddp.csv";
+//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ch-biz-diff.csv";
+
+    // 支付宝201808
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808.csv";
+    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808-ddpos-ddp.csv";
+    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/ali/ali201808-ch-biz-diff.csv";
 
     public static void main(String [] args){
 
