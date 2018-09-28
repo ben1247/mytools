@@ -7,10 +7,7 @@ import org.zy.mytools.util.CsvUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yuezhang on 18/9/26.
@@ -23,9 +20,14 @@ public class ReadBizCsvToChCsv {
 //    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
 
     // 支付宝201808
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808.csv";
-    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp.csv";
-    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp-diff.csv";
+//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808.csv";
+//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp.csv";
+//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp-diff.csv";
+
+    // 微信201808
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808.csv";
+    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddpos-ddp.csv";
+    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-biz-ch-diff.csv";
 
     public static void main(String [] args){
 
@@ -41,6 +43,9 @@ public class ReadBizCsvToChCsv {
             while ((readLine = br.readLine()) != null)  //读取到的内容给line变量
             {
                 PayStatement statement = new PayStatement(readLine);
+                if (statementMap.get(statement.getStatementId()) != null){
+                    System.out.println("流水重复了："+statement.getStatementId() + "   " + statement.getSubject() + "  " + statement.getAmount());
+                }
                 statementMap.put(statement.getStatementId(),statement);
                 totalAmount += Double.parseDouble(statement.getAmount());
                 csvLength++;
@@ -113,9 +118,9 @@ public class ReadBizCsvToChCsv {
         }
 
         // 写差异数据
-        String headLine = "支付流水号,用户名,商品名称,价格,系统";
-//        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
-        String footLine = "xxx,总金额,%s,xxx";
+//        String headLine = "支付流水号,用户名,商品名称,价格,系统";
+        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额";
+        String footLine = ",,总金额,%s,";
         BufferedWriter bw = null;
         try {
 
@@ -125,15 +130,17 @@ public class ReadBizCsvToChCsv {
             int diffLength = 0;
             double totalAmount = 0;
 
+            double csvAmount = 0;
+            double bizAmount = 0;
+
             for (Order order : orderList){
                 PayStatement statement = statementMap.get(order.getStatementId());
-                if (statement == null){
-                    System.out.println("未匹配："+order.getStatementId() + "   " + order.getGoodsName());
-                    statement = statementMap2.get(order.getStatementId());
-                    if (statement != null){
-                        System.out.println("第三方流水号："+statement.getTransactionId() + "   " + statement.getSubject());
-                    }
-                }
+//                if (statement == null){
+//                    statement = statementMap2.get(order.getStatementId());
+//                    if (statement != null){
+//                        System.out.println("第三方流水号："+statement.getTransactionId() + "   " + statement.getSubject());
+//                    }
+//                }
 
                 if (statement == null){
                     String writeLine = Order.getWriteCsv(order);
@@ -141,22 +148,30 @@ public class ReadBizCsvToChCsv {
                     diffLength++;
                     totalAmount += Double.parseDouble(order.getAmount());
                 }else{
-//                    StringBuilder writeLine = new StringBuilder();
-//                    writeLine.append(order.getStatementId()).append("\t").append(",")
-//                            .append(order.getUserName()).append(",")
-//                            .append(order.getGoodsName()).append(",")
-//                            .append(order.getAmount()).append(",")
-//                            .append(order.getSystem()).append(",")
-//                            .append(statement.getSubject()).append(",")
-//                            .append(statement.getAmount());
-//                    CsvUtil.writeLine(bw,writeLine.toString());
-
+                    Double orderAmount = Double.parseDouble(order.getAmount());
+                    Double statementAmount = Double.parseDouble(statement.getAmount());
+//                    if (!Objects.equals(orderAmount, statementAmount)){
+//                        StringBuilder writeLine = new StringBuilder();
+//                        writeLine.append(order.getStatementId()).append("\t").append(",")
+//                                .append(order.getUserName()).append(",")
+//                                .append(order.getGoodsName()).append(",")
+//                                .append(order.getAmount()).append(",")
+//                                .append(order.getSystem()).append(",")
+//                                .append(statement.getSubject()).append(",")
+//                                .append(statement.getAmount());
+//                        CsvUtil.writeLine(bw,writeLine.toString());
+//                    }
+                    csvAmount += statementAmount;
+                    bizAmount += orderAmount;
                 }
             }
 
             CsvUtil.writeLine(bw,String.format(footLine,totalAmount));
 
             System.out.println("未匹配的数据数量："+diffLength);
+            System.out.println("流水匹配金额："+csvAmount);
+            System.out.println("业务匹配总金额："+bizAmount);
+            System.out.println("业务未匹配总金额："+totalAmount);
 
         }catch (Exception e){
             e.printStackTrace();

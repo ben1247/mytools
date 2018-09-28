@@ -25,9 +25,14 @@ public class ReadChCsvToBizCsv {
 //    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201806/yifubao201806-ddpos-ddp-diff.csv";
 
     // 易付宝201807
-    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807.csv";
-    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
-    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
+//    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807.csv";
+//    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
+//    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp-diff.csv";
+
+    // 微信201808
+    static String readChannelUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808.csv";
+    static String readBizUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddpos-ddp.csv";
+    static String writeUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ch-biz-diff.csv";
 
     public static void main(String [] args){
 
@@ -87,7 +92,7 @@ public class ReadChCsvToBizCsv {
 
         // 写差异数据
         String headLine = "支付流水号,渠道流水号,价格,商品名称";
-        String footLine = "xxx,总金额,%s,xxx";
+        String footLine = ",,总金额,%s,";
         BufferedWriter bw = null;
         try {
 

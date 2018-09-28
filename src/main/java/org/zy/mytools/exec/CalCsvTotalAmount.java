@@ -20,10 +20,17 @@ public class CalCsvTotalAmount {
 //    static String readDDPOSandDDPUrl = "/Users/yuezhang/Downloads/duizhang/201807/yifubao201807-ddpos-ddp.csv";
 
     // 支付宝201808
-    static String readUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808.csv";
-    static String readDDPUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddp.csv";
-    static String readDDPOSUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos2.csv";
-    static String readDDPOSandDDPUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp.csv";
+//    static String readUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808.csv";
+//    static String readDDPUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddp.csv";
+//    static String readDDPOSUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos2.csv";
+//    static String readDDPOSandDDPUrl = "/Users/yuezhang/Downloads/duizhang/201808/ali201808-ddpos-ddp.csv";
+
+    // 微信201808
+    static String readUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808.csv";
+    static String readDDPUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddp.csv";
+    static String readDDPOSUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddpos.csv";
+    static String readDDPOSandDDPUrl = "/Users/yuezhang/Downloads/duizhang/201808V2/wx/wx201808-ddpos-ddp.csv";
+
 
     public static void main(String [] args){
 
