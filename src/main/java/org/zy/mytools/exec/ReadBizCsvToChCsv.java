@@ -147,8 +147,8 @@ public class ReadBizCsvToChCsv {
         }
 
         // 写差异数据
-//        String headLine = "支付流水号,用户名,商品名称,价格,系统,订单号";
-        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额(总计),流水金额,随机立减";
+        String headLine = "支付流水号,用户名,商品名称,价格,系统,订单号";
+//        String headLine = "支付流水号,用户名,商品名称,价格,系统,流水里的商品名称,流水金额(总计),流水金额,随机立减";
         String footLine = ",,总金额,%s,";
         BufferedWriter bw = null;
         try {
@@ -180,46 +180,46 @@ public class ReadBizCsvToChCsv {
 
                 if (statement == null){
                     String writeLine = Order.getWriteCsv(order);
-//                    CsvUtil.writeLine(bw,writeLine);
+                    CsvUtil.writeLine(bw,writeLine);
                     diffLength++;
                     totalAmount += Double.parseDouble(order.getAmount());
                 }else{
-                    Double orderAmount = Double.parseDouble(order.getAmount());
-                    Double statementAmount = Double.parseDouble(statement.getAmount());
-
-                    Double suijiAmount = 0d;
-                    // 随机立减
-                    PayStatement suijiStatement = statementMap3.get(order.getStatementId());
-                    if (suijiStatement != null){
-                        System.out.println("随机立减" + suijiStatement.getStatementId() + " " + suijiStatement.getAmount());
-                        suijiAmount = Double.parseDouble(suijiStatement.getAmount());
-                    }
-                    statementAmount = statementAmount + suijiAmount;
-
-                    if (!Objects.equals(orderAmount, statementAmount)){
-                        StringBuilder writeLine = new StringBuilder();
-                        writeLine.append(order.getStatementId()).append("\t").append(",")
-                                .append(order.getUserName()).append(",")
-                                .append(order.getGoodsName()).append(",")
-                                .append(order.getAmount()).append(",")
-                                .append(order.getSystem()).append(",")
-                                .append(statement.getSubject()).append(",")
-                                .append(statementAmount).append(",")
-                                .append(statement.getAmount()).append(",")
-                                .append(suijiAmount);
-                        CsvUtil.writeLine(bw,writeLine.toString());
-                    }
-                    csvAmount += statementAmount;
-                    bizAmount += orderAmount;
+//                    Double orderAmount = Double.parseDouble(order.getAmount());
+//                    Double statementAmount = Double.parseDouble(statement.getAmount());
+//
+//                    Double suijiAmount = 0d;
+//                    // 随机立减
+//                    PayStatement suijiStatement = statementMap3.get(order.getStatementId());
+//                    if (suijiStatement != null){
+//                        System.out.println("随机立减" + suijiStatement.getStatementId() + " " + suijiStatement.getAmount());
+//                        suijiAmount = Double.parseDouble(suijiStatement.getAmount());
+//                    }
+//                    statementAmount = statementAmount + suijiAmount;
+//
+//                    if (!Objects.equals(orderAmount, statementAmount)){
+//                        StringBuilder writeLine = new StringBuilder();
+//                        writeLine.append(order.getStatementId()).append("\t").append(",")
+//                                .append(order.getUserName()).append(",")
+//                                .append(order.getGoodsName()).append(",")
+//                                .append(order.getAmount()).append(",")
+//                                .append(order.getSystem()).append(",")
+//                                .append(statement.getSubject()).append(",")
+//                                .append(statementAmount).append(",")
+//                                .append(statement.getAmount()).append(",")
+//                                .append(suijiAmount);
+//                        CsvUtil.writeLine(bw,writeLine.toString());
+//                    }
+//                    csvAmount += statementAmount;
+//                    bizAmount += orderAmount;
                 }
             }
 
             CsvUtil.writeLine(bw,String.format(footLine,totalAmount));
 
             System.out.println("未匹配的数据数量："+diffLength);
-            System.out.println("流水匹配金额："+csvAmount);
-            System.out.println("业务匹配总金额："+bizAmount);
-//            System.out.println("业务未匹配总金额："+totalAmount);
+//            System.out.println("流水匹配金额："+csvAmount);
+//            System.out.println("业务匹配总金额："+bizAmount);
+            System.out.println("业务未匹配总金额："+totalAmount);
 
         }catch (Exception e){
             e.printStackTrace();
