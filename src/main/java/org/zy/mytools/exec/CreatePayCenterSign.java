@@ -30,7 +30,7 @@ public class CreatePayCenterSign {
             int csvLength = 0;
             while ((readLine = br.readLine()) != null)  //读取到的内容给line变量
             {
-                NotificationToMerchantResponse notification = new NotificationToMerchantResponse(readLine);
+//                NotificationToMerchantResponse notification = new NotificationToMerchantResponse(readLine);
 
 
 

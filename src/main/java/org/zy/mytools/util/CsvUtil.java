@@ -18,8 +18,11 @@ public class CsvUtil {
 
     public static BufferedReader getBufferedReader(String fileUrl){
         try {
-            return new BufferedReader(new FileReader(new File(fileUrl)));
+            return new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(new File(fileUrl))),"GBK"));
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } catch (UnsupportedEncodingException e){
             e.printStackTrace();
             return null;
         }
