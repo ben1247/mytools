@@ -1,7 +1,5 @@
 package org.zy.mytools.domain;
 
-import org.zy.mytools.util.StringUtil;
-
 import java.io.Serializable;
 
 /**
@@ -19,10 +17,15 @@ public class OrderExportInfo implements Serializable {
     private String status;
     private String appplt;
     private String appid;
+    private String appver;
+    private String shopId;
+    private String channelCode;
     private String createTime;
     private String updateTime;
     private String payTime;
     private String canal;
+    private String marketingChannel;
+    private String ppOpenId;
     private String outTradeNo;
     private String outTransactionNo;
     private String channelTradeNo;
@@ -38,7 +41,8 @@ public class OrderExportInfo implements Serializable {
     private String rightsNo;
     private String rightsCategory;
     private String brandName;
-
+    private String rightsStatus;
+    private String saleType;
 
     public OrderExportInfo(){
 
@@ -47,39 +51,88 @@ public class OrderExportInfo implements Serializable {
     public OrderExportInfo(String csvLine){
         String [] array = csvLine.split(",");
         try {
-            this.orderNo = array[0]; // 订单号
-            this.transactionNo = array[1]; // 支付流水号
-            this.userName = array[2]; // 下单用户名
-            this.payWay = array[3]; // 支付方式
-            this.payWayName = array[4]; // 支付方式解释
-            this.amount = array[5]; // 支付金额
-            this.payAmount = array[6]; // 应付金额
-            this.status = array[7]; // 支付状态
-            this.appplt = array[8]; // 平台类型
-            this.appid = array[9]; // 产品线
-            this.createTime = array[10]; // 下单时间
-            this.updateTime = array[11]; // 更新时间
-            this.payTime = array[12]; // 支付时间
-            this.canal = array[13]; // 渠道来源
-            this.outTradeNo = array[14]; // 外部订单号
-            this.outTransactionNo = array[15]; // 外部交易流水号
-            this.channelTradeNo = array[16]; // 渠道订单号
-            this.aid = array[17]; // 位置入口id
-            this.cid = array[18]; // 来源内容ID
-            this.actid = array[19]; // 活动ID
-            this.actDetailId = array[20]; // 活动明细ID
-            this.actOriginId = array[21]; // 活动原始ID
-            this.goodsNo = array[22]; // 商品编号
-            this.goodsName = array[23]; // 商品名称
-            this.price = array[24]; // 商品价格
-            this.goodsNum = array[25]; // 购买数量
-            this.rightsNo = array[26]; // 权益编号
-            this.rightsCategory = array[27]; // 权益类型
-            this.brandName = array[28]; // 品牌名称
+            this.orderNo = array[0].trim(); // 订单号
+            this.transactionNo = array[1].trim(); // 支付流水号
+            this.userName = array[2].trim(); // 下单用户名
+            this.payWay = array[3].trim(); // 支付方式
+            this.payWayName = array[4].trim(); // 支付方式解释
+            this.amount = array[5].trim(); // 支付金额
+            this.payAmount = array[6].trim(); // 应付金额
+            this.status = array[7].trim(); // 支付状态
+            this.appplt = array[8].trim(); // 平台类型
+            this.appid = array[9].trim(); // 产品线
+            this.appver = array[10].trim(); // 版本号
+            this.shopId = array[11].trim(); // 店铺ID
+            this.channelCode = array[12].trim(); // 渠道编号
+            this.createTime = array[13].trim(); // 下单时间
+            this.updateTime = array[14].trim(); // 更新时间
+            this.payTime = array[15].trim(); // 支付时间
+            this.canal = array[16].trim(); // 渠道来源
+            this.marketingChannel = array[17].trim(); // 营销推广渠道
+            this.ppOpenId = array[18].trim(); // ppOpenId
+            this.outTradeNo = array[19].trim(); // 外部订单号
+            this.outTransactionNo = array[20].trim(); // 外部交易流水号
+            this.channelTradeNo = array[21].trim(); // 渠道订单号
+            this.aid = array[22].trim(); // 位置入口id
+            this.cid = array[23].trim(); // 来源内容ID
+            this.actid = array[24].trim(); // 活动ID
+            this.actDetailId = array[25].trim(); // 活动明细ID
+            this.actOriginId = array[26].trim(); // 活动原始ID
+            this.goodsNo = array[27].trim(); // 商品编号
+            this.goodsName = array[28].trim(); // 商品名称
+            this.price = array[29].trim(); // 商品价格
+            this.goodsNum = array[30].trim(); // 购买数量
+            this.rightsNo = array[31].trim(); // 权益编号
+            this.rightsCategory = array[32].trim(); // 权益类型
+            this.brandName = array[33].trim(); // 品牌名称
+            this.rightsStatus = array[34].trim(); //权益状态
+            this.saleType = array[35].trim(); //销售类型
         }catch (Exception e){
             System.out.println("出错了!!!："  + csvLine);
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return "OrderExportInfo{" +
+                "orderNo='" + orderNo + '\'' +
+                ", transactionNo='" + transactionNo + '\'' +
+                ", userName='" + userName + '\'' +
+                ", payWay='" + payWay + '\'' +
+                ", payWayName='" + payWayName + '\'' +
+                ", amount='" + amount + '\'' +
+                ", payAmount='" + payAmount + '\'' +
+                ", status='" + status + '\'' +
+                ", appplt='" + appplt + '\'' +
+                ", appid='" + appid + '\'' +
+                ", appver='" + appver + '\'' +
+                ", shopId='" + shopId + '\'' +
+                ", channelCode='" + channelCode + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", updateTime='" + updateTime + '\'' +
+                ", payTime='" + payTime + '\'' +
+                ", canal='" + canal + '\'' +
+                ", marketingChannel='" + marketingChannel + '\'' +
+                ", ppOpenId='" + ppOpenId + '\'' +
+                ", outTradeNo='" + outTradeNo + '\'' +
+                ", outTransactionNo='" + outTransactionNo + '\'' +
+                ", channelTradeNo='" + channelTradeNo + '\'' +
+                ", aid='" + aid + '\'' +
+                ", cid='" + cid + '\'' +
+                ", actid='" + actid + '\'' +
+                ", actDetailId='" + actDetailId + '\'' +
+                ", actOriginId='" + actOriginId + '\'' +
+                ", goodsNo='" + goodsNo + '\'' +
+                ", goodsName='" + goodsName + '\'' +
+                ", price='" + price + '\'' +
+                ", goodsNum='" + goodsNum + '\'' +
+                ", rightsNo='" + rightsNo + '\'' +
+                ", rightsCategory='" + rightsCategory + '\'' +
+                ", brandName='" + brandName + '\'' +
+                ", rightsStatus='" + rightsStatus + '\'' +
+                ", saleType='" + saleType + '\'' +
+                '}';
     }
 
     public static String getWriteCsv(OrderExportInfo order){
@@ -346,5 +399,61 @@ public class OrderExportInfo implements Serializable {
 
     public void setBrandName(String brandName) {
         this.brandName = brandName;
+    }
+
+    public String getAppver() {
+        return appver;
+    }
+
+    public void setAppver(String appver) {
+        this.appver = appver;
+    }
+
+    public String getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(String shopId) {
+        this.shopId = shopId;
+    }
+
+    public String getChannelCode() {
+        return channelCode;
+    }
+
+    public void setChannelCode(String channelCode) {
+        this.channelCode = channelCode;
+    }
+
+    public String getMarketingChannel() {
+        return marketingChannel;
+    }
+
+    public void setMarketingChannel(String marketingChannel) {
+        this.marketingChannel = marketingChannel;
+    }
+
+    public String getPpOpenId() {
+        return ppOpenId;
+    }
+
+    public void setPpOpenId(String ppOpenId) {
+        this.ppOpenId = ppOpenId;
+    }
+
+    public String getRightsStatus() {
+        return rightsStatus;
+    }
+
+    public void setRightsStatus(String rightsStatus) {
+        this.rightsStatus = rightsStatus;
+    }
+
+    public String getSaleType() {
+        return saleType;
+    }
+
+    public void setSaleType(String saleType) {
+        this.saleType = saleType;
     }
 }

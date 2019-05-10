@@ -27,4 +27,9 @@ public class StringUtil {
             return str;
         }
     }
+
+    public static boolean isNotEmpty(String str){
+        return str != null && !"".equals(str);
+    }
+
 }
