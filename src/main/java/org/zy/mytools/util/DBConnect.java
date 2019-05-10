@@ -7,13 +7,8 @@ import java.sql.*;
  */
 public class DBConnect {
 
-    // 支付中心生产环境
-//    private static final String DB_URL = "jdbc:mysql://10.200.70.209:3305/pptv_pay";
-//    private static final String USER = "pp_pay";
-//    private static final String PASS = "roL9HV48P7gMmN0a";
-
     // 本地开发环境
-    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/pptv_pay";
+    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/pay";
     private static final String USER = "root";
     private static final String PASS = "root";
 

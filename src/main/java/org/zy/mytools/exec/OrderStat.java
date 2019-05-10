@@ -292,6 +292,7 @@ public class OrderStat {
                 }
 
             }else{
+//                System.out.println("其他端有：" + order.getAppid());
                 // 下单量
                 int count = apppltStat.get("other");
                 apppltStat.put("other",count+1);
