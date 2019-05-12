@@ -80,6 +80,7 @@ public class OrderStat {
      * @param orderList
      */
     public static void apppltStat(List<OrderExportInfo> orderList){
+        System.out.println("=========端统计============");
         for(OrderExportInfo order : orderList){
             String appplt = appidMap.get(order.getAppid());
             if (StringUtil.isNotEmpty(appplt)){
@@ -113,10 +114,10 @@ public class OrderStat {
             int payCount = BaseStatUtil.get(key,apppltPayStat);
             apppltTotalCount += count;
             apppltPayTotalCount += payCount;
-            System.out.println("端： " + key + "  下单量：" + count + "  支付量：" + payCount);
+            System.out.println(key + ":" + count + "," + payCount);
         }
 
-        System.out.println("端总计： 下单量：" + apppltTotalCount + "   支付量：" + apppltPayTotalCount);
+        System.out.println("总计:" + apppltTotalCount + "," + apppltPayTotalCount);
         System.out.println();
         System.out.println();
 
@@ -127,6 +128,7 @@ public class OrderStat {
      * @param orderList
      */
     public static void goodsStat(List<OrderExportInfo> orderList){
+        System.out.println("=========商品统计============");
         for(OrderExportInfo order : orderList){
             String goods = goodsMap.get(order.getGoodsNo());
             if (StringUtil.isNotEmpty(goods)){
@@ -192,10 +194,10 @@ public class OrderStat {
                 gooodsTotalCount += count;
                 goodsPayTotalCount += payCount;
             }
-            System.out.println("商品： " + key + "  下单量：" + count + "  支付量：" + payCount);
+            System.out.println(key + ":" + count + "," + payCount);
         }
 
-        System.out.println("商品总计： 下单量：" + gooodsTotalCount + "   支付量：" + goodsPayTotalCount);
+        System.out.println("总计:" + gooodsTotalCount + "," + goodsPayTotalCount);
         System.out.println();
         System.out.println();
     }
@@ -205,6 +207,7 @@ public class OrderStat {
      * @param orderList
      */
     public static void payWayStat(List<OrderExportInfo> orderList){
+        System.out.println("=========支付方式统计============");
         for(OrderExportInfo order : orderList){
             String payChannel = payWayMap.get(order.getPayWay());
             if (StringUtil.isNotEmpty(payChannel)){
@@ -219,7 +222,7 @@ public class OrderStat {
 
             }else{
                 // 下单量
-                System.out.println("其他支付：" + order.getPayWay() + "   " + order.getPayWayName());
+//                System.out.println("其他支付：" + order.getPayWay() + "   " + order.getPayWayName());
                 int count = BaseStatUtil.get("other",payWayStat);
                 BaseStatUtil.put("other",count+1,payWayStat);
                 // 支付量
@@ -237,9 +240,9 @@ public class OrderStat {
             int payCount = BaseStatUtil.get(key,payWayPayStat);
             payWayTotalCount += count;
             payWayPayTotalCount += payCount;
-            System.out.println("支付方式： " + key + "  下单量：" + count + "  支付量：" + payCount);
+            System.out.println(key + ":" + count + "," + payCount);
         }
-        System.out.println("支付方式总计： 下单量：" + payWayTotalCount + "   支付量：" + payWayPayTotalCount);
+        System.out.println("总计:" + payWayTotalCount + "," + payWayPayTotalCount);
         System.out.println();
     }
 
