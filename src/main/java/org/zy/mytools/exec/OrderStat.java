@@ -1,15 +1,14 @@
 package org.zy.mytools.exec;
 
+import org.zy.mytools.domain.BaseStat;
 import org.zy.mytools.domain.OrderExportInfo;
+import org.zy.mytools.util.BaseStatUtil;
 import org.zy.mytools.util.CsvUtil;
 import org.zy.mytools.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 订单统计
@@ -18,40 +17,337 @@ import java.util.Map;
 public class OrderStat {
 
     static String [] readChannelUrl = {
-//            "/Users/yuezhang/Downloads/orderStat/DDPOS-53-59.csv",
-//            "/Users/yuezhang/Downloads/orderStat/DDPOS-JJC-53-59.csv"
-        "/Users/yuezhang/Downloads/orderStat/DDPOS-426-502.csv",
-        "/Users/yuezhang/Downloads/orderStat/DDPOS-JJC-426-502.csv"
+            "/Users/yuezhang/Downloads/orderStat/DDPOS-53-59.csv",
+            "/Users/yuezhang/Downloads/orderStat/DDPOS-JJC-53-59.csv"
+//        "/Users/yuezhang/Downloads/orderStat/DDPOS-426-502.csv",
+//        "/Users/yuezhang/Downloads/orderStat/DDPOS-JJC-426-502.csv"
     };
 
+    public static void main(String [] args){
 
-    static Map<String,Integer> apppltStat = new HashMap<String,Integer>(){
+        List<OrderExportInfo> orderList = new ArrayList<>();
+
+        for (int i = 0; i<readChannelUrl.length; i++){
+            // 读文件
+            BufferedReader br = null;
+            try {
+                br = CsvUtil.getBufferedReader(readChannelUrl[i]);
+                String readLine;
+                int csvLength = 0;
+                while ((readLine = br.readLine()) != null)  //读取到的内容给line变量
+                {
+                    csvLength++;
+                    if (csvLength==1){continue;}
+                    OrderExportInfo orderInfo = new OrderExportInfo(readLine);
+
+                    // 过滤不需要的订单
+                    if (StringUtil.isEmpty(withOutAppidMap.get(orderInfo.getAppid()))
+                        && StringUtil.isEmpty(withOutPayWayMap.get(orderInfo.getPayWay()))){
+                        orderList.add(orderInfo);
+                    }
+                }
+//                System.out.println(readChannelUrl[i]+"流水表格中所有行数："+csvLength);
+//                System.out.println();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                if (br != null){
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+
+        // 端统计
+        apppltStat(orderList);
+
+        // 商品统计
+        goodsStat(orderList);
+
+        //支付方式统计
+        payWayStat(orderList);
+
+    }
+
+
+    /**
+     * 端统计
+     * @param orderList
+     */
+    public static void apppltStat(List<OrderExportInfo> orderList){
+        for(OrderExportInfo order : orderList){
+            String appplt = appidMap.get(order.getAppid());
+            if (StringUtil.isNotEmpty(appplt)){
+                // 下单量
+                int count = BaseStatUtil.get(appplt,apppltStat);
+                BaseStatUtil.put(appplt,count+1,apppltStat);
+                // 支付量
+                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                    int payCount = BaseStatUtil.get(appplt,apppltPayStat);
+                    BaseStatUtil.put(appplt,payCount+1,apppltPayStat);
+                }
+
+            }else{
+//                System.out.println("其他端有：" + order.getAppid());
+                // 下单量
+                int count = BaseStatUtil.get("other",apppltStat);
+                BaseStatUtil.put("other",count+1,apppltStat);
+
+                // 支付量
+                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                    int payCount = BaseStatUtil.get("other",apppltPayStat);
+                    BaseStatUtil.put("other",payCount+1,apppltPayStat);
+                }
+            }
+        }
+        int apppltTotalCount = 0;
+        int apppltPayTotalCount = 0;
+        for (BaseStat stat: apppltStat){
+            String key = stat.getKey();
+            int count = stat.getCount();
+            int payCount = BaseStatUtil.get(key,apppltPayStat);
+            apppltTotalCount += count;
+            apppltPayTotalCount += payCount;
+            System.out.println("端： " + key + "  下单量：" + count + "  支付量：" + payCount);
+        }
+
+        System.out.println("端总计： 下单量：" + apppltTotalCount + "   支付量：" + apppltPayTotalCount);
+        System.out.println();
+        System.out.println();
+
+    }
+
+    /**
+     * 商品统计
+     * @param orderList
+     */
+    public static void goodsStat(List<OrderExportInfo> orderList){
+        for(OrderExportInfo order : orderList){
+            String goods = goodsMap.get(order.getGoodsNo());
+            if (StringUtil.isNotEmpty(goods)){
+                // 下单量
+                int count = BaseStatUtil.get(goods,goodsStat);
+                BaseStatUtil.put(goods,count+1,goodsStat);
+                // VIP和SVIP的下单总量
+                if (goods.startsWith("VIP")){
+                    int c = BaseStatUtil.get("VIP",goodsStat);
+                    BaseStatUtil.put("VIP",c+1,goodsStat);
+                }else if (goods.startsWith("SVIP")){
+                    int c = BaseStatUtil.get("SVIP",goodsStat);
+                    BaseStatUtil.put("SVIP",c+1,goodsStat);
+                }
+
+                // 支付量
+                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                    int payCount = BaseStatUtil.get(goods,goodsPayStat);
+                    BaseStatUtil.put(goods,payCount+1,goodsPayStat);
+
+                    // VIP和SVIP的支付总量
+                    if (goods.startsWith("VIP")){
+                        int c = BaseStatUtil.get("VIP",goodsPayStat);
+                        BaseStatUtil.put("VIP",c+1,goodsPayStat);
+                    }else if (goods.startsWith("SVIP")){
+                        int c = BaseStatUtil.get("SVIP",goodsPayStat);
+                        BaseStatUtil.put("SVIP",c+1,goodsPayStat);
+                    }
+                }
+
+            }else{
+                // 商品大类
+                String category = categoryMap.get(order.getRightsCategory());
+                if (StringUtil.isNotEmpty(category)){
+                    // 下单量
+                    int count = BaseStatUtil.get(category,goodsStat);
+                    BaseStatUtil.put(category,count+1,goodsStat);
+                    // 支付量
+                    if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                        int payCount = BaseStatUtil.get(category,goodsPayStat);
+                        BaseStatUtil.put(category,payCount+1,goodsPayStat);
+                    }
+
+                }else {
+                    // 下单量
+                    int count = BaseStatUtil.get("other",goodsStat);
+                    BaseStatUtil.put("other",count+1,goodsStat);
+                    // 支付量
+                    if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                        int payCount = BaseStatUtil.get("other",goodsPayStat);
+                        BaseStatUtil.put("other",payCount+1,goodsPayStat);
+                    }
+                }
+            }
+        }
+        int gooodsTotalCount = 0;
+        int goodsPayTotalCount = 0;
+        for (BaseStat stat: goodsStat){
+            String key = stat.getKey();
+            int count = stat.getCount();
+            int payCount = BaseStatUtil.get(key,goodsPayStat);
+            if (!"VIP".equals(key) && !"SVIP".equals(key)){
+                gooodsTotalCount += count;
+                goodsPayTotalCount += payCount;
+            }
+            System.out.println("商品： " + key + "  下单量：" + count + "  支付量：" + payCount);
+        }
+
+        System.out.println("商品总计： 下单量：" + gooodsTotalCount + "   支付量：" + goodsPayTotalCount);
+        System.out.println();
+        System.out.println();
+    }
+
+    /**
+     * 支付方式统计
+     * @param orderList
+     */
+    public static void payWayStat(List<OrderExportInfo> orderList){
+        for(OrderExportInfo order : orderList){
+            String payChannel = payWayMap.get(order.getPayWay());
+            if (StringUtil.isNotEmpty(payChannel)){
+                // 下单量
+                int count = BaseStatUtil.get(payChannel,payWayStat);
+                BaseStatUtil.put(payChannel,count+1,payWayStat);
+                // 支付量
+                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                    int payCount = BaseStatUtil.get(payChannel,payWayPayStat);
+                    BaseStatUtil.put(payChannel,payCount+1,payWayPayStat);
+                }
+
+            }else{
+                // 下单量
+                System.out.println("其他支付：" + order.getPayWay() + "   " + order.getPayWayName());
+                int count = BaseStatUtil.get("other",payWayStat);
+                BaseStatUtil.put("other",count+1,payWayStat);
+                // 支付量
+                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                    int payCount = BaseStatUtil.get("other",payWayPayStat);
+                    BaseStatUtil.put("other",payCount+1,payWayPayStat);
+                }
+            }
+        }
+        int payWayTotalCount = 0;
+        int payWayPayTotalCount = 0;
+        for (BaseStat stat: payWayStat){
+            String key = stat.getKey();
+            int count = stat.getCount();
+            int payCount = BaseStatUtil.get(key,payWayPayStat);
+            payWayTotalCount += count;
+            payWayPayTotalCount += payCount;
+            System.out.println("支付方式： " + key + "  下单量：" + count + "  支付量：" + payCount);
+        }
+        System.out.println("支付方式总计： 下单量：" + payWayTotalCount + "   支付量：" + payWayPayTotalCount);
+        System.out.println();
+    }
+
+
+
+    // =================================================================================================================================== //
+
+    static List<BaseStat> apppltStat = new ArrayList<BaseStat>(){
         {
-            put("iph",0);
-            put("aph",0);
-            put("ipd",0);
-            put("clt",0);
-            put("web",0);
-            put("wap",0);
-            put("atv",0);
-//            put("atvos","PPOS");
-            put("other",0);
+            add(new BaseStat("iph",0));
+            add(new BaseStat("aph",0));
+            add(new BaseStat("ipd",0));
+            add(new BaseStat("clt",0));
+            add(new BaseStat("web",0));
+            add(new BaseStat("wap",0));
+            add(new BaseStat("atv",0));
+            add(new BaseStat("other",0));
         }
     };
 
-    static Map<String,Integer> apppltPayStat = new HashMap<String,Integer>(){
+    static List<BaseStat> apppltPayStat = new ArrayList<BaseStat>(){
         {
-            put("iph",0);
-            put("aph",0);
-            put("ipd",0);
-            put("clt",0);
-            put("web",0);
-            put("wap",0);
-            put("atv",0);
-//            put("atvos","PPOS");
-            put("other",0);
+            add(new BaseStat("iph",0));
+            add(new BaseStat("aph",0));
+            add(new BaseStat("ipd",0));
+            add(new BaseStat("clt",0));
+            add(new BaseStat("web",0));
+            add(new BaseStat("wap",0));
+            add(new BaseStat("atv",0));
+            add(new BaseStat("other",0));
         }
     };
+
+
+    static List<BaseStat> goodsStat = new ArrayList<BaseStat>(){
+        {
+            add(new BaseStat("VIP1",0));
+            add(new BaseStat("VIP3",0));
+            add(new BaseStat("VIP6",0));
+            add(new BaseStat("VIP12",0));
+            add(new BaseStat("VIP24",0));
+            add(new BaseStat("VIPMonthly",0));
+            add(new BaseStat("VIP",0));
+            add(new BaseStat("SVIP1",0));
+            add(new BaseStat("SVIP3",0));
+            add(new BaseStat("SVIP6",0));
+            add(new BaseStat("SVIP12",0));
+            add(new BaseStat("SVIP24",0));
+            add(new BaseStat("SVIPMonthly",0));
+            add(new BaseStat("SVIP",0));
+            add(new BaseStat("DP",0));
+            add(new BaseStat("SPORTS",0));
+            add(new BaseStat("other",0));
+        }
+    };
+
+    static List<BaseStat> goodsPayStat = new ArrayList<BaseStat>(){
+        {
+            add(new BaseStat("VIP1",0));
+            add(new BaseStat("VIP3",0));
+            add(new BaseStat("VIP6",0));
+            add(new BaseStat("VIP12",0));
+            add(new BaseStat("VIP24",0));
+            add(new BaseStat("VIPMonthly",0));
+            add(new BaseStat("VIP",0));
+            add(new BaseStat("SVIP1",0));
+            add(new BaseStat("SVIP3",0));
+            add(new BaseStat("SVIP6",0));
+            add(new BaseStat("SVIP12",0));
+            add(new BaseStat("SVIP24",0));
+            add(new BaseStat("SVIPMonthly",0));
+            add(new BaseStat("SVIP",0));
+            add(new BaseStat("DP",0));
+            add(new BaseStat("SPORTS",0));
+            add(new BaseStat("other",0));
+        }
+    };
+
+    static List<BaseStat> payWayStat = new ArrayList<BaseStat>(){
+        {
+            add(new BaseStat("ALI", 0));
+            add(new BaseStat("WX", 0));
+            add(new BaseStat("SN", 0));
+            add(new BaseStat("APPLE", 0));
+            add(new BaseStat("CMCC", 0));
+            add(new BaseStat("UNICOM", 0));
+            add(new BaseStat("TELECOM", 0));
+            add(new BaseStat("JT", 0));
+            add(new BaseStat("BD",0));
+            add(new BaseStat("other",0));
+        }
+    };
+
+    static List<BaseStat> payWayPayStat = new ArrayList<BaseStat>(){
+        {
+            add(new BaseStat("ALI", 0));
+            add(new BaseStat("WX", 0));
+            add(new BaseStat("SN", 0));
+            add(new BaseStat("APPLE", 0));
+            add(new BaseStat("CMCC", 0));
+            add(new BaseStat("UNICOM", 0));
+            add(new BaseStat("TELECOM", 0));
+            add(new BaseStat("JT", 0));
+            add(new BaseStat("BD",0));
+            add(new BaseStat("other",0));
+        }
+    };
+
 
     static Map<String,String> appidMap = new HashMap<String,String>(){
         {
@@ -65,53 +361,6 @@ public class OrderStat {
             put("pptv.wap","wap");//M站
             put("pptv.atv.launcher","atv");
             put("pptv.atv.live","atv");
-//            put("sn.tec.ppos.launcher","atvos");
-        }
-    };
-
-    static Map<String,Integer> goodsStat = new HashMap<String,Integer>(){
-        {
-            put("VIP1",0);
-            put("VIP3",0);
-            put("VIP6",0);
-            put("VIP12",0);
-            put("VIP24",0);
-            put("VIPMonthly",0);
-            put("SVIP1",0);
-            put("SVIP3",0);
-            put("SVIP6",0);
-            put("SVIP12",0);
-            put("SVIP24",0);
-            put("SVIPMonthly",0);
-            put("DP",0);
-            put("SPORTS",0);
-            put("other",0);
-
-            put("VIP",0);
-            put("SVIP",0);
-        }
-    };
-
-    static Map<String,Integer> goodsPayStat = new HashMap<String,Integer>(){
-        {
-            put("VIP1",0);
-            put("VIP3",0);
-            put("VIP6",0);
-            put("VIP12",0);
-            put("VIP24",0);
-            put("VIPMonthly",0);
-            put("SVIP1",0);
-            put("SVIP3",0);
-            put("SVIP6",0);
-            put("SVIP12",0);
-            put("SVIP24",0);
-            put("SVIPMonthly",0);
-            put("DP",0);
-            put("SPORTS",0);
-            put("other",0);
-
-            put("VIP",0);
-            put("SVIP",0);
         }
     };
 
@@ -131,13 +380,6 @@ public class OrderStat {
             put("DB6886803849512","SVIP12");
             put("DB7276817865940","SVIP24");
             put("DB7043954986732","SVIPMonthly");
-
-//            put("DB2638601673284","SVIP7day");// biuos大会员7天
-//            put("DB8057187120653","SVIP1"); // biuos大会员
-//            put("DB1287180352741","SVIP3"); // biuos大会员
-//            put("DB7367107564392","SVIP12");// biuos大会员
-//            put("DB7618602867439","SVIP13");// biuos大会员
-
         }
     };
 
@@ -148,37 +390,6 @@ public class OrderStat {
             put("CATEC","SPORTS");
         }
     };
-
-    static Map<String,Integer> payWayStat = new HashMap<String,Integer>(){
-        {
-            put("ALI", 0);
-            put("WX", 0);
-            put("SN", 0);
-            put("APPLE", 0);
-            put("CMCC", 0);
-            put("UNICOM", 0);
-            put("TELECOM", 0);
-            put("JT", 0);
-            put("BD",0);
-            put("other",0);
-        }
-    };
-
-    static Map<String,Integer> payWayPayStat = new HashMap<String,Integer>(){
-        {
-            put("ALI", 0);
-            put("WX", 0);
-            put("SN", 0);
-            put("APPLE", 0);
-            put("CMCC", 0);
-            put("UNICOM", 0);
-            put("TELECOM", 0);
-            put("JT", 0);
-            put("BD",0);
-            put("other",0);
-        }
-    };
-
 
     static Map<String,String> payWayMap = new HashMap<String,String>(){
         {
@@ -235,199 +446,11 @@ public class OrderStat {
         }
     };
 
-    public static void main(String [] args){
-
-        List<OrderExportInfo> orderList = new ArrayList<>();
-
-        for (int i = 0; i<readChannelUrl.length; i++){
-            // 读文件
-            BufferedReader br = null;
-            try {
-                br = CsvUtil.getBufferedReader(readChannelUrl[i]);
-                String readLine;
-                int csvLength = 0;
-                while ((readLine = br.readLine()) != null)  //读取到的内容给line变量
-                {
-                    csvLength++;
-                    if (csvLength==1){continue;}
-                    OrderExportInfo orderInfo = new OrderExportInfo(readLine);
-
-                    String withOutAppid = withOutAppidMap.get(orderInfo.getAppid());
-                    if (StringUtil.isNotEmpty(withOutAppid)){
-                        // 排除掉
-                    }else {
-                        orderList.add(orderInfo);
-                    }
-
-                }
-                System.out.println(readChannelUrl[i]+"流水表格中所有行数："+csvLength);
-                System.out.println();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }finally {
-                if (br != null){
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+    static Map<String,String> withOutPayWayMap = new HashMap<String,String>(){
+        {
+            put("-1","-1");
+            put("-2","-2");
+            put("full_diamond","full_diamond");
         }
-
-
-        // =======================端统计=======================
-
-        for(OrderExportInfo order : orderList){
-            String appplt = appidMap.get(order.getAppid());
-            if (StringUtil.isNotEmpty(appplt)){
-                // 下单量
-                int count = apppltStat.get(appplt);
-                apppltStat.put(appplt,count+1);
-                // 支付量
-                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = apppltPayStat.get(appplt);
-                    apppltPayStat.put(appplt,payCount+1);
-                }
-
-            }else{
-//                System.out.println("其他端有：" + order.getAppid());
-                // 下单量
-                int count = apppltStat.get("other");
-                apppltStat.put("other",count+1);
-                // 支付量
-                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = apppltPayStat.get("other");
-                    apppltPayStat.put("other",payCount+1);
-                }
-            }
-        }
-        int apppltTotalCount = 0;
-        int apppltPayTotalCount = 0;
-        for (String key : apppltStat.keySet()) {
-            int count = apppltStat.get(key);
-            int payCount = apppltPayStat.get(key);
-            apppltTotalCount += count;
-            apppltPayTotalCount += payCount;
-            System.out.println("端： " + key + "  下单量：" + count + "  支付量：" + payCount);
-        }
-        System.out.println("端总计： 下单量：" + apppltTotalCount + "   支付量：" + apppltPayTotalCount);
-        System.out.println();
-        System.out.println();
-
-
-
-        //=======================商品统计=======================
-
-        for(OrderExportInfo order : orderList){
-            String goods = goodsMap.get(order.getGoodsNo());
-            if (StringUtil.isNotEmpty(goods)){
-                // 下单量
-                int count = goodsStat.get(goods);
-                goodsStat.put(goods,count+1);
-
-                // VIP和SVIP的下单总量
-                if (goods.startsWith("VIP")){
-                    int c = goodsStat.get("VIP");
-                    goodsStat.put("VIP",c+1);
-                }else if (goods.startsWith("SVIP")){
-                    int c = goodsStat.get("SVIP");
-                    goodsStat.put("SVIP",c+1);
-                }
-
-                // 支付量
-                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = goodsPayStat.get(goods);
-                    goodsPayStat.put(goods,payCount+1);
-
-                    // VIP和SVIP的支付总量
-                    if (goods.startsWith("VIP")){
-                        int c = goodsPayStat.get("VIP");
-                        goodsPayStat.put("VIP",c+1);
-                    }else if (goods.startsWith("SVIP")){
-                        int c = goodsPayStat.get("SVIP");
-                        goodsPayStat.put("SVIP",c+1);
-                    }
-                }
-
-            }else{
-                // 商品大类
-                String category = categoryMap.get(order.getRightsCategory());
-                if (StringUtil.isNotEmpty(category)){
-                    // 下单量
-                    int count = goodsStat.get(category);
-                    goodsStat.put(category,count+1);
-                    // 支付量
-                    if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                        int payCount = goodsPayStat.get(category);
-                        goodsPayStat.put(category,payCount+1);
-                    }
-
-                }else {
-                    // 下单量
-                    int count = goodsStat.get("other");
-                    goodsStat.put("other",count+1);
-                    // 支付量
-                    if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                        int payCount = goodsPayStat.get("other");
-                        goodsPayStat.put("other",payCount+1);
-                    }
-                }
-            }
-        }
-        int gooodsTotalCount = 0;
-        int goodsPayTotalCount = 0;
-        for (String key : goodsStat.keySet()) {
-            int count = goodsStat.get(key);
-            int payCount = goodsPayStat.get(key);
-            if (!"VIP".equals(key) && !"SVIP".equals(key)){
-                gooodsTotalCount += count;
-                goodsPayTotalCount += payCount;
-            }
-
-            System.out.println("商品： " + key + "  下单量：" + count + "  支付量：" + payCount);
-        }
-        System.out.println("商品总计： 下单量：" + gooodsTotalCount + "   支付量：" + goodsPayTotalCount);
-        System.out.println();
-        System.out.println();
-
-        //=======================支付方式统计=======================
-
-        for(OrderExportInfo order : orderList){
-            String payChannel = payWayMap.get(order.getPayWay());
-            if (StringUtil.isNotEmpty(payChannel)){
-                // 下单量
-                int count = payWayStat.get(payChannel);
-                payWayStat.put(payChannel,count+1);
-                // 支付量
-                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = payWayPayStat.get(payChannel);
-                    payWayPayStat.put(payChannel,payCount+1);
-                }
-
-            }else{
-                // 下单量
-                int count = payWayStat.get("other");
-                payWayStat.put("other",count+1);
-                // 支付量
-                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = payWayPayStat.get("other");
-                    payWayPayStat.put("other",payCount+1);
-                }
-            }
-        }
-        int payWayTotalCount = 0;
-        int payWayPayTotalCount = 0;
-        for (String key : payWayStat.keySet()) {
-            int count = payWayStat.get(key);
-            int payCount = payWayPayStat.get(key);
-            payWayTotalCount += count;
-            payWayPayTotalCount += payCount;
-            System.out.println("支付方式： " + key + "  下单量：" + count + "  支付量：" + payCount);
-        }
-        System.out.println("支付方式总计： 下单量：" + payWayTotalCount + "   支付量：" + payWayPayTotalCount);
-        System.out.println();
-    }
-
+    };
 }

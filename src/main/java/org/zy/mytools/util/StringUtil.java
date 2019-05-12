@@ -32,4 +32,8 @@ public class StringUtil {
         return str != null && !"".equals(str);
     }
 
+    public static boolean isEmpty(String str){
+        return !isNotEmpty(str);
+    }
+
 }
