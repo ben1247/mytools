@@ -2,13 +2,18 @@ package org.zy.mytools.exec;
 
 import org.zy.mytools.domain.BaseStat;
 import org.zy.mytools.domain.OrderExportInfo;
+import org.zy.mytools.domain.OrderStatInfo;
 import org.zy.mytools.util.BaseStatUtil;
 import org.zy.mytools.util.CsvUtil;
 import org.zy.mytools.util.StringUtil;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 订单统计
@@ -22,6 +27,10 @@ public class OrderStat {
 //        "/Users/yuezhang/Downloads/orderStat/DDPOS-426-502.csv",
 //        "/Users/yuezhang/Downloads/orderStat/DDPOS-JJC-426-502.csv"
     };
+
+    static String writeUrl = "/Users/yuezhang/Downloads/orderStat/orderStatTemplate.csv";
+
+    static String headLine = "端,商品组,商品,支付渠道,是否下单,是否支付";
 
     public static void main(String [] args){
 
@@ -72,6 +81,8 @@ public class OrderStat {
         //支付方式统计
         payWayStat(orderList);
 
+        // 写文件
+        writeOrderToTemplate(orderList);
     }
 
 
@@ -96,13 +107,13 @@ public class OrderStat {
             }else{
 //                System.out.println("其他端有：" + order.getAppid());
                 // 下单量
-                int count = BaseStatUtil.get("other",apppltStat);
-                BaseStatUtil.put("other",count+1,apppltStat);
+                int count = BaseStatUtil.get(OTHER,apppltStat);
+                BaseStatUtil.put(OTHER,count+1,apppltStat);
 
                 // 支付量
                 if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = BaseStatUtil.get("other",apppltPayStat);
-                    BaseStatUtil.put("other",payCount+1,apppltPayStat);
+                    int payCount = BaseStatUtil.get(OTHER,apppltPayStat);
+                    BaseStatUtil.put(OTHER,payCount+1,apppltPayStat);
                 }
             }
         }
@@ -174,12 +185,12 @@ public class OrderStat {
 
                 }else {
                     // 下单量
-                    int count = BaseStatUtil.get("other",goodsStat);
-                    BaseStatUtil.put("other",count+1,goodsStat);
+                    int count = BaseStatUtil.get(OTHER,goodsStat);
+                    BaseStatUtil.put(OTHER,count+1,goodsStat);
                     // 支付量
                     if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                        int payCount = BaseStatUtil.get("other",goodsPayStat);
-                        BaseStatUtil.put("other",payCount+1,goodsPayStat);
+                        int payCount = BaseStatUtil.get(OTHER,goodsPayStat);
+                        BaseStatUtil.put(OTHER,payCount+1,goodsPayStat);
                     }
                 }
             }
@@ -223,12 +234,12 @@ public class OrderStat {
             }else{
                 // 下单量
 //                System.out.println("其他支付：" + order.getPayWay() + "   " + order.getPayWayName());
-                int count = BaseStatUtil.get("other",payWayStat);
-                BaseStatUtil.put("other",count+1,payWayStat);
+                int count = BaseStatUtil.get(OTHER,payWayStat);
+                BaseStatUtil.put(OTHER,count+1,payWayStat);
                 // 支付量
                 if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = BaseStatUtil.get("other",payWayPayStat);
-                    BaseStatUtil.put("other",payCount+1,payWayPayStat);
+                    int payCount = BaseStatUtil.get(OTHER,payWayPayStat);
+                    BaseStatUtil.put(OTHER,payCount+1,payWayPayStat);
                 }
             }
         }
@@ -246,6 +257,91 @@ public class OrderStat {
         System.out.println();
     }
 
+    /**
+     * 写订单到模版中
+     * @param orderList
+     */
+    public static void writeOrderToTemplate(List<OrderExportInfo> orderList){
+        if (orderList == null || orderList.size() == 0){
+            return;
+        }
+
+        System.out.println("开始写入订单模版里");
+
+        BufferedWriter bw = null;
+        try {
+
+            bw = CsvUtil.getBufferedWriter(writeUrl);
+            CsvUtil.writeLine(bw,headLine);
+
+            for (OrderExportInfo order : orderList){
+
+                OrderStatInfo orderStat = new OrderStatInfo();
+
+                // 端============================
+                String appplt = appidMap.get(order.getAppid());
+                if (StringUtil.isEmpty(appplt)){
+                    appplt = OTHER;
+                }
+                orderStat.setAppplt(appplt);
+
+                // 商品============================
+                String goods = goodsMap.get(order.getGoodsNo());
+                if (StringUtil.isEmpty(goods)){
+                    goods = OTHER;
+                }
+                orderStat.setGoods(goods);
+
+                // 商品组============================
+                String goodsGroup;
+                if (goods.startsWith("VIP")){
+                    goodsGroup = "VIP";
+                }else if (goods.startsWith("SVIP")){
+                    goodsGroup = "SVIP";
+                }else{
+                    goodsGroup = categoryMap.get(order.getRightsCategory());
+                    if (StringUtil.isEmpty(goodsGroup)){
+                        goodsGroup = OTHER;
+                    }
+                }
+                orderStat.setGoodsGroup(goodsGroup);
+
+                // 支付渠道============================
+                String payChannel = payWayMap.get(order.getPayWay());
+                if (StringUtil.isEmpty(payChannel)){
+                    payChannel = OTHER;
+                }
+                orderStat.setPayChannel(payChannel);
+
+                // 是否下单（只要有订单，肯定就是1）============================
+                orderStat.setIsCreate(1);
+
+                // 是否支付============================
+                orderStat.setIsPay(0);
+                if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
+                    orderStat.setIsPay(1);
+                }
+
+                // 写文件
+                String writeLine = OrderStatInfo.getWriteCsv(orderStat);
+                CsvUtil.writeLine(bw,writeLine);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (bw != null){
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("结束写入订单模版里");
+        }
+
+    }
+
 
 
     // =================================================================================================================================== //
@@ -259,7 +355,7 @@ public class OrderStat {
             add(new BaseStat("web",0));
             add(new BaseStat("wap",0));
             add(new BaseStat("atv",0));
-            add(new BaseStat("other",0));
+            add(new BaseStat(OTHER,0));
         }
     };
 
@@ -272,7 +368,7 @@ public class OrderStat {
             add(new BaseStat("web",0));
             add(new BaseStat("wap",0));
             add(new BaseStat("atv",0));
-            add(new BaseStat("other",0));
+            add(new BaseStat(OTHER,0));
         }
     };
 
@@ -295,7 +391,7 @@ public class OrderStat {
             add(new BaseStat("SVIP",0));
             add(new BaseStat("DP",0));
             add(new BaseStat("SPORTS",0));
-            add(new BaseStat("other",0));
+            add(new BaseStat(OTHER,0));
         }
     };
 
@@ -317,7 +413,7 @@ public class OrderStat {
             add(new BaseStat("SVIP",0));
             add(new BaseStat("DP",0));
             add(new BaseStat("SPORTS",0));
-            add(new BaseStat("other",0));
+            add(new BaseStat(OTHER,0));
         }
     };
 
@@ -332,7 +428,7 @@ public class OrderStat {
             add(new BaseStat("TELECOM", 0));
             add(new BaseStat("JT", 0));
             add(new BaseStat("BD",0));
-            add(new BaseStat("other",0));
+            add(new BaseStat(OTHER,0));
         }
     };
 
@@ -347,7 +443,7 @@ public class OrderStat {
             add(new BaseStat("TELECOM", 0));
             add(new BaseStat("JT", 0));
             add(new BaseStat("BD",0));
-            add(new BaseStat("other",0));
+            add(new BaseStat(OTHER,0));
         }
     };
 
@@ -456,4 +552,6 @@ public class OrderStat {
             put("full_diamond","full_diamond");
         }
     };
+    
+    final static String OTHER = "other";
 }
