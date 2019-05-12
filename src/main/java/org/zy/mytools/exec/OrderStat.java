@@ -30,8 +30,6 @@ public class OrderStat {
 
     static String writeUrl = "/Users/yuezhang/Downloads/orderStat/orderStatTemplate.csv";
 
-    static String headLine = "端,商品组,商品,支付渠道,是否下单,是否支付";
-
     public static void main(String [] args){
 
         List<OrderExportInfo> orderList = new ArrayList<>();
@@ -78,7 +76,7 @@ public class OrderStat {
         // 商品统计
         goodsStat(orderList);
 
-        //支付方式统计
+        // 支付方式统计
         payWayStat(orderList);
 
         // 写文件
@@ -552,6 +550,8 @@ public class OrderStat {
             put("full_diamond","full_diamond");
         }
     };
-    
+
+    final static String headLine = "端,商品组,商品,支付渠道,是否下单,是否支付";
+
     final static String OTHER = "other";
 }
