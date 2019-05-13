@@ -76,8 +76,8 @@ public class OrderStat {
         // 商品统计
         goodsStat(orderList);
 
-        // 支付方式统计
-        payWayStat(orderList);
+        // 支付渠道统计
+        payChannelStat(orderList);
 
         // 写文件
         writeOrderToTemplate(orderList);
@@ -215,38 +215,38 @@ public class OrderStat {
      * 支付方式统计
      * @param orderList
      */
-    public static void payWayStat(List<OrderExportInfo> orderList){
+    public static void payChannelStat(List<OrderExportInfo> orderList){
         System.out.println("=========支付方式统计============");
         for(OrderExportInfo order : orderList){
             String payChannel = payWayMap.get(order.getPayWay());
             if (StringUtil.isNotEmpty(payChannel)){
                 // 下单量
-                int count = BaseStatUtil.get(payChannel,payWayStat);
-                BaseStatUtil.put(payChannel,count+1,payWayStat);
+                int count = BaseStatUtil.get(payChannel,payChannelStat);
+                BaseStatUtil.put(payChannel,count+1,payChannelStat);
                 // 支付量
                 if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = BaseStatUtil.get(payChannel,payWayPayStat);
-                    BaseStatUtil.put(payChannel,payCount+1,payWayPayStat);
+                    int payCount = BaseStatUtil.get(payChannel,payChannelPayStat);
+                    BaseStatUtil.put(payChannel,payCount+1,payChannelPayStat);
                 }
 
             }else{
                 // 下单量
 //                System.out.println("其他支付：" + order.getPayWay() + "   " + order.getPayWayName());
-                int count = BaseStatUtil.get(OTHER,payWayStat);
-                BaseStatUtil.put(OTHER,count+1,payWayStat);
+                int count = BaseStatUtil.get(OTHER,payChannelStat);
+                BaseStatUtil.put(OTHER,count+1,payChannelStat);
                 // 支付量
                 if ("已支付".equals(order.getStatus()) || "已发放".equals(order.getStatus()) || "已支付未加权益".equals(order.getStatus())){
-                    int payCount = BaseStatUtil.get(OTHER,payWayPayStat);
-                    BaseStatUtil.put(OTHER,payCount+1,payWayPayStat);
+                    int payCount = BaseStatUtil.get(OTHER,payChannelPayStat);
+                    BaseStatUtil.put(OTHER,payCount+1,payChannelPayStat);
                 }
             }
         }
         int payWayTotalCount = 0;
         int payWayPayTotalCount = 0;
-        for (BaseStat stat: payWayStat){
+        for (BaseStat stat: payChannelStat){
             String key = stat.getKey();
             int count = stat.getCount();
-            int payCount = BaseStatUtil.get(key,payWayPayStat);
+            int payCount = BaseStatUtil.get(key,payChannelPayStat);
             payWayTotalCount += count;
             payWayPayTotalCount += payCount;
             System.out.println(key + ":" + count + "," + payCount);
@@ -281,14 +281,14 @@ public class OrderStat {
                 if (StringUtil.isEmpty(appplt)){
                     appplt = OTHER;
                 }
-                orderStat.setAppplt(appplt);
+                orderStat.setAppplt(BaseStatUtil.getName(appplt,apppltStat));
 
                 // 商品============================
                 String goods = goodsMap.get(order.getGoodsNo());
                 if (StringUtil.isEmpty(goods)){
                     goods = OTHER;
                 }
-                orderStat.setGoods(goods);
+                orderStat.setGoods(BaseStatUtil.getName(goods,goodsStat));
 
                 // 商品组============================
                 String goodsGroup;
@@ -302,14 +302,14 @@ public class OrderStat {
                         goodsGroup = OTHER;
                     }
                 }
-                orderStat.setGoodsGroup(goodsGroup);
+                orderStat.setGoodsGroup(goodsGroupMap.get(goodsGroup));
 
                 // 支付渠道============================
                 String payChannel = payWayMap.get(order.getPayWay());
                 if (StringUtil.isEmpty(payChannel)){
                     payChannel = OTHER;
                 }
-                orderStat.setPayChannel(payChannel);
+                orderStat.setPayChannel(BaseStatUtil.getName(payChannel,payChannelStat));
 
                 // 是否下单（只要有订单，肯定就是1）============================
                 orderStat.setIsCreate(1);
@@ -346,102 +346,102 @@ public class OrderStat {
 
     static List<BaseStat> apppltStat = new ArrayList<BaseStat>(){
         {
-            add(new BaseStat("iph",0));
-            add(new BaseStat("aph",0));
-            add(new BaseStat("ipd",0));
-            add(new BaseStat("clt",0));
-            add(new BaseStat("web",0));
-            add(new BaseStat("wap",0));
-            add(new BaseStat("atv",0));
-            add(new BaseStat(OTHER,0));
+            add(new BaseStat("iph","iphone",0));
+            add(new BaseStat("aph","android",0));
+            add(new BaseStat("ipd","ipad",0));
+            add(new BaseStat("clt","pc client",0));
+            add(new BaseStat("web","h5（web）",0));
+            add(new BaseStat("wap","h5（m站）",0));
+            add(new BaseStat("atv","OTT",0));
+            add(new BaseStat(OTHER,"其他",0));
         }
     };
 
     static List<BaseStat> apppltPayStat = new ArrayList<BaseStat>(){
         {
-            add(new BaseStat("iph",0));
-            add(new BaseStat("aph",0));
-            add(new BaseStat("ipd",0));
-            add(new BaseStat("clt",0));
-            add(new BaseStat("web",0));
-            add(new BaseStat("wap",0));
-            add(new BaseStat("atv",0));
-            add(new BaseStat(OTHER,0));
+            add(new BaseStat("iph","iphone",0));
+            add(new BaseStat("aph","android",0));
+            add(new BaseStat("ipd","ipad",0));
+            add(new BaseStat("clt","pc client",0));
+            add(new BaseStat("web","h5（web）",0));
+            add(new BaseStat("wap","h5（m站）",0));
+            add(new BaseStat("atv","OTT",0));
+            add(new BaseStat(OTHER,"其他",0));
         }
     };
 
 
     static List<BaseStat> goodsStat = new ArrayList<BaseStat>(){
         {
-            add(new BaseStat("VIP1",0));
-            add(new BaseStat("VIP3",0));
-            add(new BaseStat("VIP6",0));
-            add(new BaseStat("VIP12",0));
-            add(new BaseStat("VIP24",0));
-            add(new BaseStat("VIPMonthly",0));
-            add(new BaseStat("VIP",0));
-            add(new BaseStat("SVIP1",0));
-            add(new BaseStat("SVIP3",0));
-            add(new BaseStat("SVIP6",0));
-            add(new BaseStat("SVIP12",0));
-            add(new BaseStat("SVIP24",0));
-            add(new BaseStat("SVIPMonthly",0));
-            add(new BaseStat("SVIP",0));
-            add(new BaseStat("DP",0));
-            add(new BaseStat("SPORTS",0));
-            add(new BaseStat(OTHER,0));
+            add(new BaseStat("VIP1","1个月",0));
+            add(new BaseStat("VIP3","3个月",0));
+            add(new BaseStat("VIP6","6个月",0));
+            add(new BaseStat("VIP12","1年",0));
+            add(new BaseStat("VIP24","2年",0));
+            add(new BaseStat("VIPMonthly","连续包月",0));
+            add(new BaseStat("VIP","VIP小计",0));
+            add(new BaseStat("SVIP1","1个月",0));
+            add(new BaseStat("SVIP3","3个月",0));
+            add(new BaseStat("SVIP6","6个月",0));
+            add(new BaseStat("SVIP12","1年",0));
+            add(new BaseStat("SVIP24","2年",0));
+            add(new BaseStat("SVIPMonthly","连续包月",0));
+            add(new BaseStat("SVIP","SVIP小计",0));
+            add(new BaseStat("DP","单片",0));
+            add(new BaseStat("SPORTS","体育商品",0));
+            add(new BaseStat(OTHER,"其他",0));
         }
     };
 
     static List<BaseStat> goodsPayStat = new ArrayList<BaseStat>(){
         {
-            add(new BaseStat("VIP1",0));
-            add(new BaseStat("VIP3",0));
-            add(new BaseStat("VIP6",0));
-            add(new BaseStat("VIP12",0));
-            add(new BaseStat("VIP24",0));
-            add(new BaseStat("VIPMonthly",0));
-            add(new BaseStat("VIP",0));
-            add(new BaseStat("SVIP1",0));
-            add(new BaseStat("SVIP3",0));
-            add(new BaseStat("SVIP6",0));
-            add(new BaseStat("SVIP12",0));
-            add(new BaseStat("SVIP24",0));
-            add(new BaseStat("SVIPMonthly",0));
-            add(new BaseStat("SVIP",0));
-            add(new BaseStat("DP",0));
-            add(new BaseStat("SPORTS",0));
-            add(new BaseStat(OTHER,0));
+            add(new BaseStat("VIP1","1个月",0));
+            add(new BaseStat("VIP3","3个月",0));
+            add(new BaseStat("VIP6","6个月",0));
+            add(new BaseStat("VIP12","1年",0));
+            add(new BaseStat("VIP24","2年",0));
+            add(new BaseStat("VIPMonthly","连续包月",0));
+            add(new BaseStat("VIP","VIP小计",0));
+            add(new BaseStat("SVIP1","1个月",0));
+            add(new BaseStat("SVIP3","3个月",0));
+            add(new BaseStat("SVIP6","6个月",0));
+            add(new BaseStat("SVIP12","1年",0));
+            add(new BaseStat("SVIP24","2年",0));
+            add(new BaseStat("SVIPMonthly","连续包月",0));
+            add(new BaseStat("SVIP","SVIP小计",0));
+            add(new BaseStat("DP","单片",0));
+            add(new BaseStat("SPORTS","体育商品",0));
+            add(new BaseStat(OTHER,"其他",0));
         }
     };
 
-    static List<BaseStat> payWayStat = new ArrayList<BaseStat>(){
+    static List<BaseStat> payChannelStat = new ArrayList<BaseStat>(){
         {
-            add(new BaseStat("ALI", 0));
-            add(new BaseStat("WX", 0));
-            add(new BaseStat("SN", 0));
-            add(new BaseStat("APPLE", 0));
-            add(new BaseStat("CMCC", 0));
-            add(new BaseStat("UNICOM", 0));
-            add(new BaseStat("TELECOM", 0));
-            add(new BaseStat("JT", 0));
-            add(new BaseStat("BD",0));
-            add(new BaseStat(OTHER,0));
+            add(new BaseStat("SN","易付宝", 0));
+            add(new BaseStat("ALI","支付宝", 0));
+            add(new BaseStat("WX","微信", 0));
+            add(new BaseStat("APPLE","苹果支付", 0));
+            add(new BaseStat("CMCC","移动（话费）", 0));
+            add(new BaseStat("UNICOM","电信（话费）", 0));
+            add(new BaseStat("TELECOM","联通（话费）", 0));
+            add(new BaseStat("JT","交通快捷", 0));
+            add(new BaseStat("BD","百度支付",0));
+            add(new BaseStat(OTHER,"其他",0));
         }
     };
 
-    static List<BaseStat> payWayPayStat = new ArrayList<BaseStat>(){
+    static List<BaseStat> payChannelPayStat = new ArrayList<BaseStat>(){
         {
-            add(new BaseStat("ALI", 0));
-            add(new BaseStat("WX", 0));
-            add(new BaseStat("SN", 0));
-            add(new BaseStat("APPLE", 0));
-            add(new BaseStat("CMCC", 0));
-            add(new BaseStat("UNICOM", 0));
-            add(new BaseStat("TELECOM", 0));
-            add(new BaseStat("JT", 0));
-            add(new BaseStat("BD",0));
-            add(new BaseStat(OTHER,0));
+            add(new BaseStat("SN","易付宝", 0));
+            add(new BaseStat("ALI","支付宝", 0));
+            add(new BaseStat("WX","微信", 0));
+            add(new BaseStat("APPLE","苹果支付", 0));
+            add(new BaseStat("CMCC","移动（话费）", 0));
+            add(new BaseStat("UNICOM","电信（话费）", 0));
+            add(new BaseStat("TELECOM","联通（话费）", 0));
+            add(new BaseStat("JT","交通快捷", 0));
+            add(new BaseStat("BD","百度支付",0));
+            add(new BaseStat(OTHER,"其他",0));
         }
     };
 
@@ -487,6 +487,17 @@ public class OrderStat {
             put("CATEC","SPORTS");
         }
     };
+
+    static Map<String,String> goodsGroupMap = new HashMap<String,String>(){
+        {
+            put("VIP","VIP");
+            put("SVIP","SVIP");
+            put("DP","单片");
+            put("SPORTS","体育商品");
+            put(OTHER,"其他");
+        }
+    };
+
 
     static Map<String,String> payWayMap = new HashMap<String,String>(){
         {

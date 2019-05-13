@@ -6,14 +6,16 @@ package org.zy.mytools.domain;
 public class BaseStat {
 
     private String key;
+    private String name;
     private int count;
 
-    public BaseStat(String key){
-        this(key,0);
+    public BaseStat(String key,String name){
+        this(key,name,0);
     }
 
-    public BaseStat(String key , int count){
+    public BaseStat(String key , String name,int count){
         this.key = key;
+        this.name = name;
         this.count = count;
     }
 
@@ -23,6 +25,14 @@ public class BaseStat {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getCount() {

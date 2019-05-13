@@ -31,4 +31,15 @@ public class BaseStatUtil {
         }
     }
 
+    public static String getName(String key , List<BaseStat> list){
+        if (key == null || "".equals(key) || list == null || list.size() == 0) return null;
+
+        for (BaseStat stat: list){
+            if (stat.getKey().equals(key)){
+                return stat.getName();
+            }
+        }
+        return null;
+    }
+
 }
