@@ -562,7 +562,7 @@ public class OrderStat {
         }
     };
 
-    final static String headLine = "端,商品组,商品,支付渠道,是否下单,是否支付";
+    final static String headLine = "端,商品组,商品,支付渠道,下单量,支付量";
 
     final static String OTHER = "other";
 }
