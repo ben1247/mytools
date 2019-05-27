@@ -22,10 +22,10 @@ import java.util.Map;
 public class OrderStat {
 
     static String [] readChannelUrl = {
-//        "/Users/yuezhang/Downloads/orderStat/DDPOS-506-512.csv",
-//        "/Users/yuezhang/Downloads/orderStat/DDPOS_CIBN_JJC-506-512.csv"
-          "/Users/yuezhang/Downloads/orderStat/DDPOS-513-519.csv",
-          "/Users/yuezhang/Downloads/orderStat/DDPOS_CIBN_JJC-513-519.csv"
+//          "/Users/yuezhang/Downloads/orderStat/DDPOS-513-519.csv",
+//          "/Users/yuezhang/Downloads/orderStat/DDPOS_CIBN_JJC-513-519.csv"
+            "/Users/yuezhang/Downloads/orderStat/DDPOS-520-526.csv",
+            "/Users/yuezhang/Downloads/orderStat/DDPOS_CIBN_JJC-520-526.csv"
     };
 
     static String writeUrl = "/Users/yuezhang/Downloads/orderStat/orderStatTemplate.csv";
