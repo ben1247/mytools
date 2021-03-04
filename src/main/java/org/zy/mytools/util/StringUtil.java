@@ -36,4 +36,14 @@ public class StringUtil {
         return !isNotEmpty(str);
     }
 
+    public static void main(String [] args){
+        int fillZeroLength = 5;
+        int version = 1;
+        StringBuilder sb = new StringBuilder();
+        sb.append("%0").append(fillZeroLength).append("d");
+
+        String result = String.format(sb.toString(), version);
+//        String result = String.format("%0{0}d","5", version);
+        System.out.println(result);
+    }
 }
